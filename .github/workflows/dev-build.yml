@@ -1,9 +1,6 @@
 name: dev-build
 run-name: Build plugin for development
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
@@ -97,9 +94,9 @@ jobs:
         run: |
           python3 - <<'PYTHON'
           import zipfile
-          with zipfile.ZipFile("out/Steamcord.zip") as archive:
+          with zipfile.ZipFile("out/Steamcord Plus.zip") as archive:
               for name in ("host.py", "vesktop_win.py"):
-                  assert "Steamcord/" + name in archive.namelist(), name
+                  assert "Steamcord Plus/" + name in archive.namelist(), name
           PYTHON
 
       - name: Upload plugin

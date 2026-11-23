@@ -90,7 +90,8 @@ import { useOpenChat } from "./components/ExpandedNav";
 import { TextChat } from "./components/TextChat";
 import { DiscordRuntimeControl, WaitingGameMode } from "./components/DiscordRuntimeControl";
 import { ProxySection } from "./components/ProxySettings";
-import { t, errText } from "./i18n";
+import { t, errText, LOCALES, getLocaleChoice, setLocaleChoice } from "./i18n";
+import { PLUGIN_NAME } from "./pluginName";
 import {
   call,
   addEventListener,
@@ -1095,13 +1096,13 @@ const UpdaterSection = () => {
     const backend: any = (window as any).DeckyBackend;
     if (!backend?.addEventListener) return;
     const onStart = (name: string) => {
-      if (name !== "Steamcord") return;
+      if (name !== PLUGIN_NAME) return;
       if (confirmTimer.current) { clearTimeout(confirmTimer.current); confirmTimer.current = null; }
       unhookCancel();
       setStatus("installing");
     };
     const onFinish = (name: string) => {
-      if (name !== "Steamcord") return;
+      if (name !== PLUGIN_NAME) return;
       unhookCancel();
       // Decky recharge le plugin dans la foulée ; on remet quand même l'état au
       // propre au cas où le panneau resterait monté.
@@ -1185,7 +1186,7 @@ const UpdaterSection = () => {
         const backend: any = (window as any).DeckyBackend;
         if (backend?.call) {
           try {
-            await backend.call("loader/reload_plugin", "Steamcord");
+            await backend.call("loader/reload_plugin", PLUGIN_NAME);
             // Le panneau à l'écran n'est PAS remonté par le rechargement : Steam
             // garde l'arbre React déjà monté, et il restait donc figé sur
             // « Installation… » — vu à l'écran le 22/09, alors même que le
@@ -1218,7 +1219,7 @@ const UpdaterSection = () => {
     if (backend?.call) {
       try {
         // (artifact, name, version, hash, install_type) — 2 = InstallType.UPDATE
-        await backend.call("utilities/install_plugin", url, "Steamcord", latest, "", 2);
+        await backend.call("utilities/install_plugin", url, PLUGIN_NAME, latest, "", 2);
         setStatus("confirm");
         hookCancel();
         if (confirmTimer.current) clearTimeout(confirmTimer.current);
@@ -1852,13 +1853,14 @@ const AboutSection = () => {
       </SR>
       <SR>
         <div style={{ fontSize: 11, color: "#aaa", lineHeight: 1.6 }}>
-          <div><b style={{ color: "#fff" }}>Steamcord</b>{version ? ` v${version}` : ""}</div>
-          <div>{t("about_by")} <span style={{ color: "#67a3ff" }}>Necrosiak</span></div>
+          <div><b style={{ color: "#fff" }}>{PLUGIN_NAME}</b>{version ? ` v${version}` : ""}</div>
+          <div>Steamcord {t("about_by")} <span style={{ color: "#67a3ff" }}>Necrosiak</span></div>
+          <div>{t("about_fork")} <span style={{ color: "#67a3ff" }}>K1tsune12</span></div>
         </div>
       </SR>
       <SR>
         <div style={{ height: 8 }} />
-        <WideBtn focused={ghFocused} onFocus={() => setGhFocused(true)} onBlur={() => setGhFocused(false)} onClick={() => open("https://github.com/Necrosiak/Steamcord")}><IcGithub /> GitHub</WideBtn>
+        <WideBtn focused={ghFocused} onFocus={() => setGhFocused(true)} onBlur={() => setGhFocused(false)} onClick={() => open("https://github.com/K1tsune12/kitsune-steamcord-plus")}><IcGithub /> GitHub</WideBtn>
       </SR>
     </>
   );
@@ -2158,6 +2160,24 @@ const OpenViewConfig = () => {
   );
 };
 
+// Interface language: follows SteamOS unless one is picked here. The choice is
+// read by t() on the next render, so this section updates at once and the rest
+// of the panel follows the next time it is opened.
+const LanguageConfig = () => {
+  const [choice, setChoice] = useState(getLocaleChoice());
+  return (
+    <SR>
+      <Dropdown
+        strDefaultLabel={t("config_language")}
+        selectedOption={choice}
+        rgOptions={[{ data: "auto", label: t("language_auto") }, ...LOCALES.map((l) => ({ data: l.id, label: l.label }))]}
+        onChange={(e: any) => { setLocaleChoice(e.data); setChoice(e.data); }}
+      />
+      <div style={{ fontSize: 11, opacity: 0.65, marginTop: 6 }}>{t("language_hint")}</div>
+    </SR>
+  );
+};
+
 // Nom affiché sur Discord (global_name) — distinct de l'identifiant de
 // connexion (username), que le panneau montrait jusqu'ici. Vide = revenir à
 // l'identifiant, comme dans Discord.
@@ -2336,6 +2356,11 @@ const ConfigPanel = () => {
     <div className="sc-settings">
       <style>{SETTINGS_GAPS}</style>
       <SR><DiscordRuntimeControl /></SR>
+      <hr />
+      <SR>
+        <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6 }}><IcChat /> {t("config_language")}</div>
+      </SR>
+      <LanguageConfig />
       <hr />
       <SR>
         <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6 }}><IcController /> {t("config_status")}</div>
@@ -2585,7 +2610,7 @@ export default definePlugin(() => {
     if (w.__scReloadTried === key) return;
     w.__scReloadTried = key;
     console.log("[Steamcord] backend older than the installed files — asking the loader to reload", why);
-    w.DeckyBackend?.call?.("loader/reload_plugin", "Steamcord")?.catch?.(() => {});
+    w.DeckyBackend?.call?.("loader/reload_plugin", PLUGIN_NAME)?.catch?.(() => {});
   };
   const reloadIfPending = () => {
     call<[], { pending?: boolean; installed?: string }>("get_reload_pending").then((r) => {

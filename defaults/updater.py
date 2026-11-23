@@ -45,7 +45,7 @@ def _ssl_context():
         return None
 
 # --- per-plugin configuration -------------------------------------------------
-GITHUB_REPO = "Necrosiak/Steamcord"
+GITHUB_REPO = "K1tsune12/kitsune-steamcord-plus"
 # -----------------------------------------------------------------------------
 
 RELEASES_API = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"

@@ -15,7 +15,35 @@ const NAV_MAP: Record<string, Locale> = {
   it: "it", pt: "pt", nl: "nl", pl: "pl", ru: "ru",
 };
 
+// Manual choice from the settings ("auto" or unset = follow SteamOS).
+const LOCALE_KEY = "steamcord_locale";
+export const LOCALES: { id: Locale; label: string }[] = [
+  { id: "en", label: "English" }, { id: "pt", label: "Português (Brasil)" },
+  { id: "fr", label: "Français" }, { id: "de", label: "Deutsch" },
+  { id: "es", label: "Español" }, { id: "it", label: "Italiano" },
+  { id: "nl", label: "Nederlands" }, { id: "pl", label: "Polski" },
+  { id: "ru", label: "Русский" },
+];
+
+export function getLocaleChoice(): Locale | "auto" {
+  try {
+    const v = localStorage.getItem(LOCALE_KEY);
+    if (v && LOCALES.some((l) => l.id === v)) return v as Locale;
+  } catch {}
+  return "auto";
+}
+
+export function setLocaleChoice(choice: Locale | "auto") {
+  try {
+    if (choice === "auto") localStorage.removeItem(LOCALE_KEY);
+    else localStorage.setItem(LOCALE_KEY, choice);
+  } catch {}
+  _locale = null;
+}
+
 function detectLocale(): Locale {
+  const chosen = getLocaleChoice();
+  if (chosen !== "auto") return chosen;
   try {
     const lm = (window as any).LocalizationManager;
     for (const k of ["m_strLanguage", "strLanguage", "language"]) {
@@ -34,6 +62,17 @@ let _locale: Locale | null = null;
 
 const T: Record<Locale, Dict> = {
   en: {
+    overlay_pos_custom: "Custom",
+    overlay_offset_x: "Horizontal offset",
+    overlay_offset_y: "Vertical offset",
+    overlay_names: "Names shown",
+    overlay_names_nick: "Server nickname",
+    overlay_names_global: "Display name",
+    overlay_names_username: "Username",
+    config_language: "Language",
+    language_auto: "Automatic (Steam language)",
+    language_hint: "Close and reopen this menu to apply the language everywhere.",
+    about_fork: "Plus edition by",
     overlay_pov_source: "Overlay video source",
     overlay_pov_auto: "Screen first, otherwise camera",
     overlay_pov_camera: "Camera",
@@ -1766,6 +1805,26 @@ const T: Record<Locale, Dict> = {
     update_done_note: "Steamcord {v} è installato. Chiudi e riapri il menu di accesso rapido per caricarlo.",
   },
   pt: {
+    overlay_pos_custom: "Personalizada",
+    overlay_offset_x: "Deslocamento horizontal",
+    overlay_offset_y: "Deslocamento vertical",
+    overlay_names: "Nomes exibidos",
+    overlay_names_nick: "Apelido do servidor",
+    overlay_names_global: "Nome de exibição",
+    overlay_names_username: "Nome de usuário",
+    config_language: "Idioma",
+    language_auto: "Automático (idioma do Steam)",
+    language_hint: "Feche e reabra este menu para aplicar o idioma em tudo.",
+    about_fork: "Edição Plus por",
+    discord_runtime_title: "Sessão do Discord",
+    discord_runtime_hint: "Pare o Discord para liberar memória. Isso encerra chamadas e compartilhamentos, mas mantém seu login salvo. Volta a ficar ligado quando o Steamcord reinicia.",
+    discord_runtime_paused: "O Discord está desligado. A reabertura e as tentativas de reconexão automáticas estão pausadas.",
+    discord_runtime_on: "Iniciar o Discord",
+    discord_runtime_off: "Desligar o Discord…",
+    discord_runtime_confirm: "Parar o Discord e encerrar a chamada e o compartilhamento de tela atuais? Seu login salvo é mantido.",
+    discord_runtime_cancel: "Cancelar",
+    discord_runtime_stop: "Desligar",
+    discord_runtime_error: "Não foi possível concluir. Tente de novo; se o Discord estiver pausado, você pode iniciá-lo aqui.",
     overlay_pov_source: "Fonte de vídeo da sobreposição",
     overlay_pov_auto: "Primeiro ecrã, senão câmara",
     overlay_pov_camera: "Câmara",

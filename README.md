@@ -1,3 +1,19 @@
+# Steamcord Plus
+
+A fork of [Steamcord](https://github.com/Necrosiak/Steamcord) by Necrosiak, the Decky Loader plugin that brings Discord voice chat, private messages and screen sharing to Steam Gaming Mode. Everything upstream does is kept; this edition adds:
+
+- **Server nicknames in the voice overlay.** The in-game roster, the join/leave lines and the voice panel show the name each person uses in that server, falling back to their display name and then their username. A setting switches between the three.
+- **Free overlay placement.** The eight preset positions stay, and a new **Custom** position unlocks horizontal and vertical offsets (0 to 100% of the free screen space).
+- **Language picker.** The interface still follows the SteamOS language by default; Settings now has a Language entry to force any of the nine languages, including Português (Brasil).
+
+It installs as its own plugin, **Steamcord Plus**, so it does not get replaced by upstream updates. Run only one of the two at a time: both drive the same Vesktop instance.
+
+Licensed under the BSD 3-Clause License, same as upstream. See [LICENSE](LICENSE) and [CREDITS.md](CREDITS.md).
+
+The upstream documentation follows.
+
+---
+
 # Steamcord
 
 **Discord in Steam Gaming Mode** — a [Decky Loader](https://github.com/SteamDeckHomebrew/decky-loader) plugin for Steam Deck / Bazzite / SteamOS and Windows (Big Picture).

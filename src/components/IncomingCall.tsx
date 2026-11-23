@@ -1,3 +1,4 @@
+import { PLUGIN_NAME } from "../pluginName";
 // Page « appel entrant », ouverte en cliquant la notification d'un appel MP.
 // Répondre rejoint l'appel puis ouvre le panneau Steamcord du QAM, qui affiche
 // l'appel en cours (contrôles micro, membres, partage). Si la sonnerie s'arrête
@@ -17,7 +18,7 @@ const DEFAULT_AVATAR = "https://cdn.discordapp.com/embed/avatars/0.png";
 // est l'état interne que son propre menu utilise. Sans lui, le QAM s'ouvre sur
 // l'onglet Decky, mais sur le dernier plugin consulté.
 export function openSteamcordPanel() {
-  try { (window as any).DeckyPluginLoader?.deckyState?.setActivePlugin?.("Steamcord"); } catch {}
+  try { (window as any).DeckyPluginLoader?.deckyState?.setActivePlugin?.(PLUGIN_NAME); } catch {}
   try { Navigation.OpenQuickAccessMenu(QuickAccessTab.Decky); } catch (e) { console.error("[Steamcord] ouverture du QAM échouée", e); }
 }
 
