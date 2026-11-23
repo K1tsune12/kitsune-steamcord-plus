@@ -6272,6 +6272,9 @@ class Plugin:
                 pass
             cls._overlay_proc = await create_subprocess_exec(
                 sys_python(), str(script), "--state-dir", cls._overlay_dir(),
+                # Game Mode: stay out of the single external-overlay slot so the
+                # Steam FPS counter keeps showing next to the roster.
+                "--layer", "external" if _desktop_session() else "notification",
                 *cls._overlay_backend_args(),
                 env=env, stdout=PIPE, stderr=PIPE)
             create_task(stream_watcher(cls._overlay_proc.stdout, prefix="[overlay]"))

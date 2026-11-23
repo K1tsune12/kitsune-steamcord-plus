@@ -91,11 +91,22 @@ def capabilities(requested_backend="auto"):
     }
 
 
+# Which gamescope layer paints the window.
+#   external     — GAMESCOPE_EXTERNAL_OVERLAY, the atom mangoapp uses. gamescope
+#                  composites exactly ONE such window, so the roster and the
+#                  Steam performance overlay (FPS counter) hide each other.
+#   notification — STEAM_OVERLAY on a window narrower than the screen, which
+#                  gamescope files under its separate notification layer. The
+#                  roster and the FPS counter are then both drawn.
+LAYER = "external"
+LAYER_ATOMS = {"external": "GAMESCOPE_EXTERNAL_OVERLAY", "notification": "STEAM_OVERLAY"}
+
+
 def _set_atoms_xlib(xid):
     from Xlib import display, Xatom
     d = display.Display()
     w = d.create_resource_object("window", xid)
-    w.change_property(d.intern_atom("GAMESCOPE_EXTERNAL_OVERLAY"), Xatom.CARDINAL, 32, [1])
+    w.change_property(d.intern_atom(LAYER_ATOMS[LAYER]), Xatom.CARDINAL, 32, [1])
     w.change_property(
         d.intern_atom("_NET_WM_WINDOW_TYPE"), Xatom.ATOM, 32,
         [d.intern_atom("_KDE_NET_WM_WINDOW_TYPE_ON_SCREEN_DISPLAY"),
@@ -122,7 +133,7 @@ def _set_atoms_ctypes(xid):
     try:
         XA_ATOM, XA_CARDINAL, REPLACE = 4, 6, 0
         one = (c_ulong * 1)(1)
-        x.XChangeProperty(d, xid, x.XInternAtom(d, b"GAMESCOPE_EXTERNAL_OVERLAY", False),
+        x.XChangeProperty(d, xid, x.XInternAtom(d, LAYER_ATOMS[LAYER].encode(), False),
                           XA_CARDINAL, 32, REPLACE, one, 1)
         types = (c_ulong * 2)(
             x.XInternAtom(d, b"_KDE_NET_WM_WINDOW_TYPE_ON_SCREEN_DISPLAY", False),
@@ -176,10 +187,19 @@ def build_window():
             sw, sh = geo.width, geo.height
     except Exception as e:
         print("[overlay] monitor geometry failed, falling back to 1920x1080:", e, flush=True)
+    if LAYER == "notification":
+        # gamescope treats a STEAM_OVERLAY window as wide as the screen as the
+        # interactive Steam overlay; one pixel narrower makes it a notification
+        # layer window. fullscreen() would stretch it back to the full width.
+        sw -= 1
     win.set_default_size(sw, sh)
     win.set_size_request(sw, sh)
     win.move(0, 0)
-    win.fullscreen()
+    if LAYER == "notification":
+        # Fixed size: nothing may grow the window back to the full width.
+        win.set_resizable(False)
+    else:
+        win.fullscreen()
 
     rgba = win.get_screen().get_rgba_visual()
     if rgba:
@@ -197,12 +217,26 @@ def build_window():
         except Exception as e:
             passthrough = False
             print("[overlay] input passthrough failed:", e, flush=True)
-        print("[overlay] mapped xid=%s atom=%s passthrough=%s"
-              % (hex(xid), ok, passthrough), flush=True)
+        print("[overlay] mapped xid=%s atom=%s layer=%s passthrough=%s"
+              % (hex(xid), ok, LAYER, passthrough), flush=True)
         # #92: centred positions looked ~50 px high on a Deck. Log what GTK
         # reports so a report shows whether the window matches the screen.
         print("[overlay] screen %dx%d window %dx%d" % (sw, sh, win.get_allocated_width(),
                                                       win.get_allocated_height()), flush=True)
+        if LAYER == "notification":
+            GLib.timeout_add(500, check_width)
+
+    def check_width():
+        # The X window must stay narrower than the screen (see above). Verify
+        # the real geometry once it has settled and correct it if needed.
+        gdk_win = win.get_window()
+        if gdk_win is None:
+            return False
+        if gdk_win.get_width() != sw:
+            print("[overlay] X window is %dx%d, forcing %dx%d"
+                  % (gdk_win.get_width(), gdk_win.get_height(), sw, sh), flush=True)
+            gdk_win.resize(sw, sh)
+        return False
 
     win.connect("map", on_map)
     win.connect("destroy", Gtk.main_quit)
@@ -1087,7 +1121,11 @@ def main():
     # WebKit rame) ; « auto » = WebKit si dispo, sinon cairo.
     ap.add_argument("--backend", choices=("auto", "webkit", "cairo"),
                     default=os.environ.get("STEAMCORD_OVERLAY_BACKEND", "auto"))
+    ap.add_argument("--layer", choices=tuple(LAYER_ATOMS),
+                    default=os.environ.get("STEAMCORD_OVERLAY_LAYER", "external"))
     args = ap.parse_args()
+    global LAYER
+    LAYER = args.layer if args.layer in LAYER_ATOMS else "external"
 
     if args.probe:
         print(json.dumps(capabilities(args.backend)), flush=True)
