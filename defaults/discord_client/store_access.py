@@ -9,6 +9,9 @@ class User:
         # Nom affiché Discord, distinct de l'identifiant de connexion. L'objet
         # UserStore du client le nomme `globalName`, l'API REST `global_name`.
         self.global_name = data.get("globalName") or data.get("global_name") or ""
+        # Server nickname in the guild of the current voice channel ("" in DMs
+        # or when the member has none). Filled from the voice-state payloads.
+        self.nick = data.get("nick") or ""
 
         self.is_muted = False
         self.is_deafened = False
@@ -33,12 +36,30 @@ class User:
         self.name = r["username"]
         self.discriminator = r["discriminator"]
         self.avatar = r["avatar"]
+        if not self.global_name:
+            self.global_name = r.get("globalName") or r.get("global_name") or ""
+
+    def apply_names(self, vs):
+        """Take nick / global name from a voice-state payload when it carries
+        them. Gateway-originated payloads do not, and must not wipe them."""
+        if "nick" in vs:
+            self.nick = vs.get("nick") or ""
+        if vs.get("globalName"):
+            self.global_name = vs["globalName"]
+
+    @property
+    def display_name(self):
+        # What Discord itself shows in a voice channel: server nickname first,
+        # then the global display name, then the login.
+        return self.nick or self.global_name or str(self)
 
     def to_dict(self):
         return {
             "id": self.id,
             "username": str(self),
             "global_name": self.global_name,
+            "nick": self.nick,
+            "display_name": self.display_name,
             "avatar": self.avatar,
             "is_muted": self.is_muted,
             "is_deafened": self.is_deafened,

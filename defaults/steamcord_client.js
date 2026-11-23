@@ -7,6 +7,25 @@ window.STEAMCORD_IS_VESKTOP = window.STEAMCORD_IS_VESKTOP
     || !!window.VesktopNative
     || (navigator.userAgent || "").toLowerCase().includes("vesktop");
 
+// ── Names of a voice participant ─────────────────────────────────────────────
+// Server nickname (in the guild that owns the voice channel) and global display
+// name. The backend cannot query the Discord stores itself, so every voice-state
+// payload sent to it carries these two fields.
+window.__sc_names = (userId, channelId) => {
+    const out = { nick: "", globalName: "" };
+    try {
+        const C = Vencord.Webpack.Common;
+        const u = C.UserStore?.getUser?.(userId);
+        out.globalName = (u && (u.globalName || u.global_name)) || "";
+        const guildId = channelId && C.ChannelStore?.getChannel?.(channelId)?.guild_id;
+        if (guildId) {
+            const GMS = C.GuildMemberStore || Vencord.Webpack.findStore?.("GuildMemberStore");
+            out.nick = GMS?.getNick?.(guildId, userId) || GMS?.getMember?.(guildId, userId)?.nick || "";
+        }
+    } catch (_) {}
+    return out;
+};
+
 // ── Description lisible d'un échec de commande ───────────────────────────────
 // `String(e)` ne convient QUE pour une Error. Un rejet de `RestAPI` n'en est
 // pas une : c'est un objet {status, body:{message, code}} et `String()` en tire
@@ -2358,6 +2377,7 @@ window.Vencord.Plugins.plugins.Steamcord = {
                                         mute: vs.mute || vs.selfMute || false,
                                         deaf: vs.deaf || vs.selfDeaf || false,
                                         video: vs.selfVideo || false,
+                                        ...window.__sc_names(vs.userId, data.id),
                                     }));
                                     break;
                                 }
@@ -3217,10 +3237,11 @@ window.Vencord.Plugins.plugins.Steamcord = {
                                     mute: !!(v.mute || v.selfMute), selfMute: !!v.selfMute,
                                     deaf: !!(v.deaf || v.selfDeaf), selfDeaf: !!v.selfDeaf,
                                     video: !!v.selfVideo, selfVideo: !!v.selfVideo,
-                                    suppress: !!v.suppress
+                                    suppress: !!v.suppress,
+                                    ...window.__sc_names(uid, vcid)
                                 });
                             }
-                            const sig = JSON.stringify(vsArr.map(s => [s.userId, s.mute, s.deaf, s.video]));
+                            const sig = JSON.stringify(vsArr.map(s => [s.userId, s.mute, s.deaf, s.video, s.nick, s.globalName]));
                             if (sig !== window.__sc_lastVoiceSig) {
                                 window.__sc_lastVoiceSig = sig;
                                 window.STEAMCORD_WS.send(JSON.stringify({ type: "VOICE_STATE_UPDATES", voiceStates: vsArr }));

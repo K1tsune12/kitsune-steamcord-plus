@@ -37,7 +37,7 @@ function TileLabel({ user, kind }: { user: any; kind?: string }) {
       background: "rgba(0,0,0,0.55)", color: "#fff", maxWidth: "100%", boxSizing: "border-box",
     }}>
       {kindIcon(kind)}
-      <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user.username}</span>
+      <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user.display_name || user.username}</span>
       {(user.is_muted || user.is_deafened) && <IcMicMuteFill color="#ed4245" size={11} />}
       <div style={{
         width: 7, height: 7, borderRadius: "50%", background: "#23a55a", flexShrink: 0,
@@ -60,7 +60,7 @@ function VideoTile({ user, kind, track }: { user: any; kind: string; track: Medi
   return (
     <Btn noFocusRing
       onClick={() => showModal(
-        <FullscreenVideoModal track={track} userId={user.id} label={<>{kindIcon(kind)} {user.username}</>} />
+        <FullscreenVideoModal track={track} userId={user.id} label={<>{kindIcon(kind)} {user.display_name || user.username}</>} />
       )}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}

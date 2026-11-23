@@ -32,7 +32,13 @@
     padding: calc(3px * var(--scale)) calc(9px * var(--scale)) calc(3px * var(--scale)) calc(4px * var(--scale));
     width: fit-content;
   }
-  #roster.top-right .row, #roster.center-right .row, #roster.bottom-right .row {
+  /* Custom position: --fx / --fy are fractions of the free screen space. */
+  #roster.custom {
+    left: calc(18px + (100vw - 36px) * var(--fx)); top: calc(18px + (100vh - 36px) * var(--fy));
+    transform: translate(calc(-100% * var(--fx)), calc(-100% * var(--fy)));
+  }
+  #roster.custom.rside { align-items: flex-end; }
+  #roster.top-right .row, #roster.center-right .row, #roster.bottom-right .row, #roster.rside .row {
     flex-direction: row-reverse;
     padding: calc(3px * var(--scale)) calc(4px * var(--scale)) calc(3px * var(--scale)) calc(9px * var(--scale));
   }
@@ -122,8 +128,12 @@
     lastVoice = v;
     if (!v || !v.enabled) { roster.className = ""; roster.innerHTML = ""; return; }
     const s = v.settings || {};
-    const pos = ["top-left","top-center","top-right","center-left","center-right","bottom-left","bottom-center","bottom-right"].includes(s.pos) ? s.pos : "bottom-left";
-    roster.className = "on " + pos;
+    const pos = ["top-left","top-center","top-right","center-left","center-right","bottom-left","bottom-center","bottom-right","custom"].includes(s.pos) ? s.pos : "bottom-left";
+    const frac = (value, fallback) => Number.isFinite(value) ? Math.max(0, Math.min(100, value)) / 100 : fallback;
+    const fx = frac(s.offset_x, 0), fy = frac(s.offset_y, .5);
+    roster.className = "on " + pos + (pos === "custom" && fx > .5 ? " rside" : "");
+    roster.style.setProperty("--fx", String(fx));
+    roster.style.setProperty("--fy", String(fy));
     roster.style.opacity = String((typeof s.opacity === "number" ? s.opacity : 85) / 100);
     roster.style.setProperty("--scale", String(displayScale(s.scale)));
     const rows = (v.users || []).map((u) => {
@@ -139,7 +149,7 @@
       + '<span class="ename">' + esc(e.name) + '</span></div>').join("");
     // Les annonces se placent du côté libre : au-dessus du roster en bas
     // d'écran, en dessous en haut d'écran.
-    roster.innerHTML = pos.startsWith("bottom") ? events + rows : rows + events;
+    roster.innerHTML = (pos === "custom" ? fy >= .5 : pos.startsWith("bottom")) ? events + rows : rows + events;
   };
   // Une annonce expire même si rien d'autre ne change dans le state.
   setInterval(() => {

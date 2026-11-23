@@ -6146,6 +6146,12 @@ class Plugin:
         voice = cls._overlay_settings.get("voice")
         cls._overlay_settings["voice"] = {
             "pos": "bottom-left", "opacity": 85, "scale": 100, "enabled": False,
+            # Custom position: where the roster sits, in percent of the free
+            # screen space (0 = left/top edge, 100 = right/bottom edge).
+            "offset_x": 0, "offset_y": 50,
+            # Which name the roster shows: nick (server nickname, falling back
+            # to the display name) | global (display name) | username (login).
+            "names": "nick",
             **(voice if isinstance(voice, dict) else {})}
         cls._overlay_settings.setdefault(
             "pov", {"layout": "right", "opacity": 90, "scale": 100})
@@ -6201,11 +6207,17 @@ class Plugin:
             st = state or cls.evt_handler.build_state_dict()
             vc = st.get("vc") or {}
             users = []
+            names = (cls._load_overlay_settings().get("voice") or {}).get("names")
             for u in vc.get("users") or []:
                 av = u.get("avatar")
+                login = u.get("username")
+                shown = (login if names == "username"
+                         else (u.get("global_name") or login) if names == "global"
+                         else (u.get("display_name") or login))
                 users.append({
                     "id": u.get("id"),
-                    "username": u.get("username"),
+                    # The overlay renderers draw this field as-is.
+                    "username": shown,
                     "avatar_url": (
                         f"https://cdn.discordapp.com/avatars/{u.get('id')}/{av}.webp?size=64"
                         if av else "https://cdn.discordapp.com/embed/avatars/0.png"),

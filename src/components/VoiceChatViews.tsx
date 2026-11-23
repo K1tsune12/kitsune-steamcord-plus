@@ -329,7 +329,7 @@ export function VoiceChatChannel() {
   const inGuild = !!state.vc.guild_name;
   const others = (state.vc.users || [])
     .filter((u: any) => u && u.id !== state.me?.id)
-    .map((u: any) => u.username)
+    .map((u: any) => u.display_name || u.username)
     .filter(Boolean);
   const subtitle = inGuild
     ? state.vc.guild_name
@@ -642,7 +642,7 @@ function UserRow({ user, isSelf }: { user: any; isSelf?: boolean }) {
           )}
         </div>
         <span style={{ flex: 1, fontSize: px(13), opacity: muted ? 0.45 : 0.9, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-          {user?.username}
+          {user?.display_name || user?.username}
         </span>
         {user?.is_live && <Pill color={DANGER}>LIVE</Pill>}
         {/* Toujours monté (jamais ajouté/retiré du DOM) : la pastille "en train
@@ -855,8 +855,35 @@ function OverlayMenuContent() {
                   { data: "bottom-left", label: t("overlay_pos_bl") },
                   { data: "bottom-center", label: t("overlay_pos_bc") },
                   { data: "bottom-right", label: t("overlay_pos_br") },
+                  { data: "custom", label: t("overlay_pos_custom") },
                 ]}
                 onChange={(e: any) => pushVoice({ pos: e.data })}
+              />
+              {voice.pos === "custom" && (
+                <>
+                  <SliderFieldAny
+                    label={<>{t("overlay_offset_x")} {voice.offset_x ?? 0}%</>}
+                    value={voice.offset_x ?? 0} min={0} max={100} step={1}
+                    onChange={(v: number) => pushVoice({ offset_x: v })}
+                    bottomSeparator="none"
+                  />
+                  <SliderFieldAny
+                    label={<>{t("overlay_offset_y")} {voice.offset_y ?? 50}%</>}
+                    value={voice.offset_y ?? 50} min={0} max={100} step={1}
+                    onChange={(v: number) => pushVoice({ offset_y: v })}
+                    bottomSeparator="none"
+                  />
+                </>
+              )}
+              <DropdownAny
+                strDefaultLabel={t("overlay_names")}
+                selectedOption={voice.names || "nick"}
+                rgOptions={[
+                  { data: "nick", label: `${t("overlay_names")}: ${t("overlay_names_nick")}` },
+                  { data: "global", label: `${t("overlay_names")}: ${t("overlay_names_global")}` },
+                  { data: "username", label: `${t("overlay_names")}: ${t("overlay_names_username")}` },
+                ]}
+                onChange={(e: any) => pushVoice({ names: e.data })}
               />
               <SliderFieldAny
                 label={<>{t("overlay_opacity")} {voice.opacity}%</>}

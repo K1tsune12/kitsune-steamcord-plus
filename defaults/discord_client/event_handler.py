@@ -356,6 +356,7 @@ class EventHandler:
                     user.is_deafened = vs.get("deaf", False)
                     user.is_video = vs.get("video", False)
                     await user.populate(self.api)
+                    user.apply_names(vs)
                     self.vc_members[user_id] = user
         except Exception as e:
             logger.error(f"Failed to load voice states: {e}")
@@ -398,6 +399,7 @@ class EventHandler:
                     # temps réel dans le salon où on est déjà connecté.
                     await self._play_sound("user_join")
                 u = self.vc_members[user_id]
+                u.apply_names(vs)
                 # Lecture défensive multi-casse (camelCase store / snake_case gateway)
                 # pour ne jamais rester coincé sur un faux « muet ».
                 def _flag(*keys):

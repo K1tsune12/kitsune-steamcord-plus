@@ -482,7 +482,13 @@ class RosterArea(Gtk.DrawingArea):
         st = v.get("settings") or {}
         pos = st.get("pos") if st.get("pos") in (
             "top-left", "top-center", "top-right", "center-left", "center-right",
-            "bottom-left", "bottom-center", "bottom-right") else "bottom-left"
+            "bottom-left", "bottom-center", "bottom-right", "custom") else "bottom-left"
+        # Custom position: offsets in percent of the free screen space.
+        custom = pos == "custom"
+
+        def _pct(value, default):
+            return max(0.0, min(100.0, float(value))) / 100.0 if isinstance(value, (int, float)) else default
+        off_x, off_y = _pct(st.get("offset_x"), 0.0), _pct(st.get("offset_y"), 0.5)
         opacity = st.get("opacity")
         opacity = (opacity if isinstance(opacity, (int, float)) else 85) / 100.0
         scale = st.get("scale")
@@ -497,7 +503,7 @@ class RosterArea(Gtk.DrawingArea):
         mute_sz = self.MUTE * scale
         gap_row = self.GAP_ROW * scale
         row_h = av + 2 * pad_v
-        right = pos.endswith("right")
+        right = off_x > 0.5 if custom else pos.endswith("right")
         # Haut / bas au centre (#103) : rangées centrées, nom à droite de l'avatar.
         centered = pos.endswith("-center")
 
@@ -530,16 +536,28 @@ class RosterArea(Gtk.DrawingArea):
         ev_total = len(ev_rows) * (ev_h + gap_row)
 
         total_h = len(rows) * row_h + max(0, len(rows) - 1) * gap_row
-        top = pos.startswith("top")
+        top = off_y < 0.5 if custom else pos.startswith("top")
         y = ((H - total_h - ev_total) / 2 if pos.startswith("center") else
              self.MARGIN if top else H - self.MARGIN - total_h - ev_total)
+        if custom:
+            y = self.MARGIN + (H - 2 * self.MARGIN - total_h - ev_total) * off_y
         y = max(self.MARGIN, y)
+
+        # Custom position: every row is aligned inside one block as wide as the
+        # widest row, and the block slides across the free width.
+        block_w = max([r["w"] for r in rows] + [e["w"] for e in ev_rows] + [0])
+        block_x = self.MARGIN + max(0.0, W - 2 * self.MARGIN - block_w) * off_x
+
+        def row_x(w):
+            if custom:
+                return block_x + block_w - w if right else block_x
+            return (W - w) / 2 if centered else (W - self.MARGIN - w) if right else self.MARGIN
 
         cr.push_group()
 
         def draw_events(y):
             for e in ev_rows:
-                x = (W - e["w"]) / 2 if centered else (W - self.MARGIN - e["w"]) if right else self.MARGIN
+                x = row_x(e["w"])
                 cr.set_source_rgba(0, 0, 0, 0.45)
                 self._rounded(cr, x, y, e["w"], ev_h, 12 * scale)
                 cr.fill()
@@ -559,7 +577,7 @@ class RosterArea(Gtk.DrawingArea):
             y = draw_events(y)
         for r in rows:
             u = r["u"]
-            x = (W - r["w"]) / 2 if centered else (W - self.MARGIN - r["w"]) if right else self.MARGIN
+            x = row_x(r["w"])
 
             cr.set_source_rgba(0, 0, 0, 0.55)
             self._rounded(cr, x, y, r["w"], row_h, radius)
@@ -1024,7 +1042,21 @@ def run_cairo(state_dir, state_path):
         return True
 
     tick()
-    GLib.timeout_add(300, tick)
+    # Pick up a new state the moment the backend writes it instead of up to
+    # 300 ms later (the speaking halo is the visible part of that delay). The
+    # file is replaced atomically, so the directory is what gets watched. The
+    # slow poll only covers a monitor that is unavailable or missed an event.
+    poll_ms = 300
+    try:
+        from gi.repository import Gio
+        monitor = Gio.File.new_for_path(state_dir).monitor_directory(
+            Gio.FileMonitorFlags.NONE, None)
+        monitor.connect("changed", lambda *_args: tick() and None)
+        state["monitor"] = monitor          # keep a reference alive
+        poll_ms = 2000
+    except Exception as e:
+        print("[overlay] state monitor unavailable, polling: %r" % (e,), flush=True)
+    GLib.timeout_add(poll_ms, tick)
 
     def log_pov_health():
         if receiver:
