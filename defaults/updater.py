@@ -115,8 +115,16 @@ def _fetch_latest_blocking() -> dict:
         RELEASES_API,
         headers={"User-Agent": _USER_AGENT, "Accept": "application/vnd.github+json"},
     )
-    with _urlopen(req, timeout=15) as resp:
-        rel = json.loads(resp.read().decode("utf-8"))
+    try:
+        with _urlopen(req, timeout=15) as resp:
+            rel = json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        # 404 = no published release (or a private repository): that is an
+        # answer, not a network failure, so it must not be retried or logged
+        # as an error every 30 seconds.
+        if e.code != 404:
+            raise
+        return {"tag": "", "url": "", "notes": ""}
 
     tag = rel.get("tag_name") or rel.get("name") or ""
     # Prefer a .zip asset (the one produced by `decky plugin build`); fall back
