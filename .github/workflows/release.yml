@@ -1,9 +1,6 @@
 name: release
 run-name: Build & publish plugin release
 on:
-  push:
-    tags:
-      - "v*"
   workflow_dispatch:
 
 permissions:

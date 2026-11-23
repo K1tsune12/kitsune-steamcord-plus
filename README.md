@@ -4,6 +4,7 @@ A fork of [Steamcord](https://github.com/Necrosiak/Steamcord) by Necrosiak, the 
 
 - **Server nicknames in the voice overlay.** The in-game roster, the join/leave lines and the voice panel show the name each person uses in that server, falling back to their display name and then their username. A setting switches between the three.
 - **Free overlay placement.** The eight preset positions stay, and a new **Custom** position unlocks horizontal and vertical offsets (0 to 100% of the free screen space).
+- **Works next to the Steam FPS counter.** gamescope composites only one external overlay window, so the voice overlay and the performance overlay used to hide each other. In Game Mode the voice overlay now sits on gamescope's notification layer and both stay visible.
 - **Language picker.** The interface still follows the SteamOS language by default; Settings now has a Language entry to force any of the nine languages, including Português (Brasil).
 
 It installs as its own plugin, **Steamcord Plus**, so it does not get replaced by upstream updates. Run only one of the two at a time: both drive the same Vesktop instance.
