@@ -1,226 +1,31 @@
 # Steamcord Plus
 
-A fork of [Steamcord](https://github.com/Necrosiak/Steamcord) by Necrosiak, the Decky Loader plugin that brings Discord voice chat, private messages and screen sharing to Steam Gaming Mode. Everything upstream does is kept; this edition adds:
+Discord in Steam Gaming Mode: voice chat, private messages and screen sharing from the Quick Access Menu, as a [Decky Loader](https://github.com/SteamDeckHomebrew/decky-loader) plugin for Steam Deck, Bazzite and SteamOS.
 
-- **Server nicknames in the voice overlay.** The in-game roster, the join/leave lines and the voice panel show the name each person uses in that server, falling back to their display name and then their username. A setting switches between the three.
-- **Free overlay placement.** The eight preset positions stay, and a new **Custom** position unlocks horizontal and vertical offsets (0 to 100% of the free screen space).
-- **Works next to the Steam FPS counter.** gamescope composites only one external overlay window, so the voice overlay and the performance overlay used to hide each other. In Game Mode the voice overlay now sits on gamescope's notification layer and both stay visible.
-- **Language picker.** The interface still follows the SteamOS language by default; Settings now has a Language entry to force any of the nine languages, including Português (Brasil).
+A personal fork of [Steamcord](https://github.com/Necrosiak/Steamcord) by Necrosiak. Everything upstream does is kept; this edition adds:
 
-It installs as its own plugin, **Steamcord Plus**, so it does not get replaced by upstream updates. Run only one of the two at a time: both drive the same Vesktop instance.
+- **Server nicknames in the voice overlay.** The in-game roster, the join and leave lines and the voice panel show the name each person uses in that server, falling back to their display name and then their username. A setting switches between the three.
+- **Free overlay placement.** Eight preset positions, plus a **Custom** position with horizontal and vertical offsets (0 to 100% of the free screen space).
+- **Works next to the Steam FPS counter.** gamescope composites only one external overlay window, so the voice overlay and the performance overlay used to hide each other. In Game Mode the voice overlay sits on gamescope's notification layer and both stay visible.
+- **Language picker.** The interface follows the SteamOS language by default; Settings has a Language entry to force any of the nine languages, including Português (Brasil).
 
-Licensed under the BSD 3-Clause License, same as upstream. See [LICENSE](LICENSE) and [CREDITS.md](CREDITS.md).
+## Install
 
-The upstream documentation follows.
+1. Download the zip from the [latest release](https://github.com/K1tsune12/kitsune-steamcord-plus/releases/latest).
+2. In Decky Loader, enable Developer mode and choose **Install plugin from ZIP file**.
+3. Open Steamcord Plus from the Quick Access Menu. The first start installs Vesktop (Flatpak) and shows a QR code to log in to Discord.
 
----
+It installs as its own plugin, **Steamcord Plus**. Run it or Steamcord, not both: they drive the same Vesktop instance.
 
-# Steamcord
+## Build
 
-**Discord in Steam Gaming Mode** — a [Decky Loader](https://github.com/SteamDeckHomebrew/decky-loader) plugin for Steam Deck / Bazzite / SteamOS and Windows (Big Picture).
-
-Voice chat, private messages and screen sharing from the Quick Access Menu, without leaving Game Mode and without a second device.
-
-🌍 **Languages:** **English** · [Français](docs/README.fr.md) · [Deutsch](docs/README.de.md) · [Español](docs/README.es.md) · [Italiano](docs/README.it.md) · [Português](docs/README.pt.md) · [Nederlands](docs/README.nl.md) · [Polski](docs/README.pl.md) · [Русский](docs/README.ru.md)
-
-> **Steamcord is an independent project.** It was originally inspired by
-> [Deckcord](https://github.com/marios8543/Deckcord) (see Credits), but the codebase has been
-> largely rewritten and now follows its own direction — it is not affiliated with or endorsed
-> by that project.
->
-> The plugin UI is fully translated into 9 languages and follows your SteamOS language automatically.
-
-## What's new
-
-- **New: Windows support** — Steamcord now also runs in Steam Big Picture on Windows, with Decky from Playhub or musika08's Decky Loader for Windows. See [Steamcord on Windows](docs/WINDOWS.md). Thanks to [@SilvertongueRED](https://github.com/SilvertongueRED) for their contribution!
-- **Expanded view** — The Steam main menu entry is now named **Steamcord**. It opens the existing expanded Discord view; the Quick Access panel remains available.
-- v1.41.4: Private conversations refresh automatically and follow the latest sent/received message. Pin a conversation with the small pin icon and use the arrows beside pinned chats to change their order. Pins and their order are saved per Discord account and shared between Voice, Text and Big Screen. Controller navigation fixes were tested on Bazzite; feedback from other SteamOS devices is welcome.
-- The experimental in-game POV overlay can render through GStreamer VP8/WebM on SteamOS without WebKitGTK, when the required system plugins are installed. See [issue #70](https://github.com/Necrosiak/Steamcord/issues/70) for testing progress.
-- Notifications from other Decky plugins can use AudioLoader sound packs again; toasts explicitly marked silent stay silent. See [issue #72](https://github.com/Necrosiak/Steamcord/issues/72).
-
----
-
-## How it works
-
-Steamcord runs **[Vesktop](https://github.com/Vencord/Vesktop)** — a real, native Discord client — invisibly in the background, and drives it over the Chrome DevTools Protocol. The plugin injects a small client into it and exposes everything in the Steam **Quick Access Menu**.
-
-Going native fixes the hard problems of the old hidden-browser approach: **your microphone and the voice audio work natively**, exactly as in the desktop Discord app — no capture hacks, no autoplay workarounds. Vesktop is launched (and installed if missing) automatically, stays logged in across reboots, and never needs a desktop window in Gaming Mode.
-
----
-
-## Features
-
-- **One Discord per Steam account (multi-session)** — Every Steam user on the machine gets their **own Discord profile**: switch the Steam account and Steamcord switches Discord automatically within seconds (the first time shows the QR login; after that each session is remembered). Nobody lands in someone else's Discord.
-- **QR code login** — Scan a QR code with the Discord mobile app to log in instantly. On your phone: *Discord → Settings → Scan QR Code*, then aim at the code shown in the panel. No password typing on the Deck.
-- **CAPTCHA solver, no Desktop Mode** — Discord sometimes puts a CAPTCHA on its login page; until it is solved no login ticket is issued and the QR code just keeps refreshing. Steamcord detects that and mirrors the login page in Gaming Mode so you can clear the challenge with the controller: D-pad moves the pointer, A clicks.
-- **Unified navigation** — Top tabs **Voice / Text / ⚙️ Settings**, with a shared **Servers / DMs** switch underneath, so the same source toggle works for both voice and text.
-- **Voice chat** — Join voice channels and hear everyone, with each member shown live (speaking ring, mute/deafen badges), a per-user volume slider (0–200%) **and a per-user local mute** (silence someone just for you, without them knowing). Mic and audio are native (Vesktop).
-- **Game / Discord sound** — A slider in the call balances the game against Discord in your headset, like the PlayStation party chat mix. Only what you hear changes: the call and your Go Live are untouched. It stays inactive in Desktop Mode and can be disabled in the call panel.
-- **Voice overlay preferences** — Keep the overlay choice for the next call, use centered side positions and show your own mute/deafen and streaming indicators.
-- **Experimental GeForce NOW game titles** — Detect the game from a readable native-client window; see [supported paths and test limits](docs/GEFORCE-NOW.md).
-- **Private messages (DMs & Group DMs)** — Browse your conversations and start/join voice calls with friends directly from the Quick Access Menu. Active calls are highlighted.
-- **Server voice browser** — See which voice channels have people in them (with member avatars) before joining.
-- **Text chat — servers *and* DMs** — Read and reply to a server channel **or a private conversation** from the QAM (full-width input, Steam keyboard opens automatically). **Image attachments show as thumbnails** (loaded only while the channel is open) and **links open in the Steam Gaming Mode browser**. Auto-scrolls to the latest message.
-- **Discord status on your name** — Your **clickable username** at the top shows your current status; tap it to change it. Optional auto-sync makes Discord **follow your Steam status** in the background; picking one by hand switches back to manual.
-- **Audio device selection** — From Settings, choose the **output (Discord sound)** and **input (microphone)** device — *Auto (system default)* or a specific device, e.g. send Discord audio to your **headset only** while games stay on HDMI. A **Reload audio devices** button makes both the system and Discord re-read the devices — for a microphone that is not picked up in Gaming Mode.
-- **Mute / Deafen / Disconnect** — One-tap voice controls from the QAM, with Discord's own native sound cues (mute/unmute, deafen/undeafen, disconnect, participants joining/leaving).
-- **Soundboard** — Browse and play the default sounds, the current server's sounds, and (with Nitro) every other server's sounds, right from the voice call view. You hear your own sounds too, just like the real client.
-- **Screen share** — Share your whole screen to a voice channel (Go Live), natively in Desktop, Big Picture and Gaming Mode. In Gaming Mode Steamcord supplies a small ScreenCast portal (`portal_shim.py`) that gives Chromium the gamescope PipeWire node used by Steam Game Recording. Game audio is carried through a dedicated isolated bridge, so Discord call audio is never sent back into the stream. No kernel module or rootfs write is needed. The GStreamer WebRTC relay and the **"Share screen (game mode)"** virtual-camera button (v4l2loopback) remain fallbacks; the camera button is hidden unless *Show virtual camera sharing* is turned on in Settings. The QAM thumbnail is a `gamescopectl` snapshot, refreshed only while the QAM is visible outside a running game, to avoid starving the screen-share buffer pool.
-- **Watching a stream keeps the screen awake** — while you are watching someone's Go Live (in the panel, the expanded view or the fullscreen grid), the SteamOS screen saver is switched off, then put back exactly as it was. It can be turned off in Settings, and screen dimming and auto-sleep are never touched.
-- **Share game audio** — Stream your game's sound into the voice channel **along with your voice**. Two mix sliders (🎙️ voice / 🎮 game) control what the others hear, while you keep hearing the game normally — and it works even **without a physical microphone** (the plugin creates a virtual *Steamcord Mic* input).
-- **In-game notifications** — Incoming DM calls and pings appear as **native Steam notifications (popup + sound)**, respecting your Discord status (silenced when invisible / do-not-disturb). A message rings on both sides at once (Discord's own sound and Steam's), so the notification settings let you pick which one you keep — Discord by default.
-- **Open a notification** — Selecting a DM or server mention opens the matching conversation at that message. An incoming call opens Steamcord's Answer / Decline window; the conversation and call windows share Steamcord's dark style.
-- **🕹️ Controller voice shortcut** — Capture **any button combo on your controller** and bind it to **mute toggle** or **push-to-talk**. It also works in-game with the QAM closed, with a **Steam Controller (2026)**, the **Steam Deck's built-in controller** or a standard gamepad (Xbox, DualSense, Switch 2, 8BitDo…) ([details](#controller-voice-shortcut-in-game)). Set it up in the Settings tab.
-- **Share screenshots** — Send a Steam screenshot straight into the conversation you have open.
-- **[Vencord](https://vencord.dev/)** is built into Vesktop, giving access to its plugin ecosystem.
-- **Save attachments** — Any file posted in a conversation can be saved to your Downloads folder: images, videos, and everything else (PDFs, archives, logs) that used to show up as a bare count. Images and videos open fullscreen in the panel rather than in the Steam browser.
-- **Forward messages** — Send a message, with its images and files, to another channel or DM without leaving the game. The author's name travels with it.
-- **Scheduled events** — See what is coming up on your servers, open an event for its banner, description and attendees, and join one that is already running straight into its voice channel.
-- **🖥️ Expanded view (proof of concept)** — A full-screen Discord, opened from the icon next to your name: DMs showing what each person is doing, **friends** (activity, message anyone, call, add by username, requests), **servers** unfolding into **members by role**, events, text channels and voice channels with their **channel chat**, every event in one place, the current call and settings. Chats open inside the view; **L1 / R1** go back and forward, **B** goes up one level — out of a chat or a server's members, then back to the Quick Access panel, which the sidebar also offers as a button. The panel's settings choose which of the two the Steamcord icon opens. **Y** on a person opens Profile, Message, Call and friend / block actions. Leaving the view never ends a call. How much the background behind it is dimmed is adjustable in Settings, up to hiding it completely. *Still a proof of concept — bugs are expected, reports welcome.*
-- **Streamer mode** — While you are live (Discord Go Live, or a [BoneCast](https://github.com/Necrosiak/BoneCast) stream or recording), notifications are held so they don't end up in the video, then shown afterwards. *Always on* covers OBS and other streaming software.
-- **Display name** — The panel shows your Discord display name instead of your login, and you can change it from Settings.
-- 🐧 **Compatibility** — we actively work to support every OS that can run Steam in Gaming Mode / Big Picture (Linux for now): portable detection, vendored Python deps, no distro-specific assumptions. Per-distro package notes: [docs/OS-NOTES.md](docs/OS-NOTES.md).
-
----
-
-## 📸 Screenshots
-
-<p align="center">
-  <img src="docs/img/steamcord-qam-servers.jpg" width="49%" alt="Steamcord panel in the Quick Access Menu, server list"/>
-  <img src="docs/img/steamcord-qam-call.jpg" width="49%" alt="Steamcord panel during a voice call"/>
-</p>
-<p align="center">
-  <img src="docs/img/steamcord-expanded-friends.jpg" width="49%" alt="Expanded view, friends online with their activity"/>
-  <img src="docs/img/steamcord-expanded-servers.jpg" width="49%" alt="Expanded view, server list"/>
-</p>
-<p align="center">
-  <img src="docs/img/steamcord-expanded-chat.jpg" width="49%" alt="Expanded view, chat opened inside the view"/>
-  <img src="docs/img/steamcord-expanded-call.jpg" width="49%" alt="Expanded view, current call"/>
-</p>
-
-## 📺 Featured in
-
-[![Gaming On Steam — Steamcord](https://i.ytimg.com/vi/lTR5N7Zerls/hqdefault.jpg)](https://www.youtube.com/watch?v=lTR5N7Zerls)
-
-Video review and written guide by **[Gaming On Steam](https://www.youtube.com/@gaming_onsteam)** — [watch the video](https://www.youtube.com/watch?v=lTR5N7Zerls) · [read the guide](https://gamingonsteam.com/2026/10/21/steam-deck-guide-steamcord-discord-gaming-mode). Thank you!
-
-## Installation
-
-> **Not yet on the Decky Store.** Install manually via Developer Mode.
-
-1. Enable **Developer Mode** in Decky → General settings
-2. Go to **Developer** in Decky settings
-3. Install from URL:
-   `https://github.com/Necrosiak/Steamcord/releases/latest/download/Steamcord.zip`
-   > ⚠️ Decky Loader 3.3 and newer shows a *Third-Party Plugin Installation* warning here, because the plugin is not from the Decky Store. That is expected: wait 5 seconds and confirm. It only appears once, and updates install by themselves afterwards.
-
-> **A note on automatic updates.** Decky owns the plugin's top-level directory,
-> so the built-in updater can rewrite existing files but cannot create new ones.
-> A release that adds a file at the top level therefore has to be installed the
-> normal way — *Install plugin from URL*, above — rather than through the
-> automatic update. The release notes say so whenever that is the case.
-
-Vesktop is installed and launched automatically by the plugin the first time it runs. Just log in once (QR code, or Vesktop in Desktop Mode) and you stay logged in.
-
-Nothing else is required: the Python dependencies are vendored, and the handful of system tools some features shell out to (`pw-dump`, `pactl`, `ffmpeg`, `gamescopectl`) are optional — each one only costs the feature it powers, and the backend logs a `[deps]` line at startup naming any that are missing. See **[docs/OS-NOTES.md](docs/OS-NOTES.md)** for the full table and per-distro packages, including NixOS, Gentoo, Alpine and Void.
-
-### Screen share
-Screen sharing works out of the box — the plugin auto-installs its Python dependency (aiohttp) for the system Python on first run. GStreamer is provided by the system.
-
-### Controller voice shortcut in-game
-While a game has focus, Steam stops delivering controller buttons to its own UI, so a plugin cannot see them through Steam's API. Steamcord therefore reads the controller directly, in read-only mode and alongside Steam, so the shortcut keeps working in-game: the **Steam Controller (2026)** (tested through its USB dongle; wired and Bluetooth use the same report format) and the **Steam Deck's built-in controller** support A/B/X/Y, D-pad, L4/R4 and L5/R5; standard gamepads (Xbox, DualSense, 8BitDo… — anything Linux sees as a gamepad) support A/B/X/Y and the D-pad. Controllers that Steam takes over completely (such as the Switch 2 Pro Controller over USB) are read through Steam's own virtual gamepad, which Steam only feeds while a game has focus. Shortcuts using other buttons only work while the Steam UI or the QAM has focus.
-
-Remapping a controller button to a keyboard key in the game's Steam Input layout, then binding that key in Steamcord, does **not** work in Game Mode: Steam Input's keyboard output goes through gamescope and never shows up as a `/dev/input` device. Bind a real keyboard key or mouse button instead, or use voice activity.
-
-### Keyboard / mouse push-to-talk outside SteamOS
-Binding the voice shortcut to a **controller** button works everywhere. Binding it to a **keyboard key or mouse button** requires the plugin to read `/dev/input/event*`, which needs a `uaccess` ACL — and systemd grants that to **joysticks only** (`70-uaccess.rules`: `ENV{ID_INPUT_JOYSTICK}`). SteamOS ships an extra rule covering input devices; most other distributions do not.
-
-Measured on Bazzite: a USB wireless mouse returned `EACCES` on all five of its nodes, and a keyboard was readable only because an unrelated RGB-lighting rule happened to tag it. The shortcut panel tells you when a device is present but unreadable, instead of silently offering nothing.
-
-To opt in, as root:
-
-```
-# /etc/udev/rules.d/70-input-uaccess.rules
-SUBSYSTEM=="input", ENV{ID_INPUT_KEYBOARD}=="1", TAG+="uaccess"
-SUBSYSTEM=="input", ENV{ID_INPUT_MOUSE}=="1", TAG+="uaccess"
-```
-
-```
-sudo udevadm control --reload-rules && sudo udevadm trigger --subsystem-match=input
-```
-
-⚠️ Know what this costs: `uaccess` lets **any** process running as your user read every keystroke on the machine, in any window — not just this plugin. It is the same trade SteamOS makes on the Deck, which is reasonable on a single-user games console and much less so on a machine you also work on. Delete the file to revert.
-
----
-
-## Build from source
-
-```bash
-git clone https://github.com/Necrosiak/Steamcord
-cd Steamcord
+```sh
 pnpm install
 pnpm run build
-# copy dist/, main.py, defaults/, plugin.json, package.json to ~/homebrew/plugins/Steamcord/
-sudo systemctl restart plugin_loader
 ```
 
----
+The plugin folder is `dist/`, `main.py`, `plugin.json`, `package.json`, `LICENSE`, `py_modules/` and the contents of `defaults/` placed at its root.
 
-## 🐛 Issues & ideas — don't hesitate!
+## License
 
-Found a bug, something misbehaving on your distro, or missing a feature?
-**Please open an [issue](https://github.com/Necrosiak/Steamcord/issues)** —
-every report directly shapes what gets built next. Include if you can:
-
-- your distro & version (Bazzite 42, CachyOS, Ubuntu 24.04…) and how Steam runs (Gaming Mode / Big Picture / desktop)
-- the plugin version (Settings → Update) and whether Vesktop is flatpak or native
-- what you did, what you expected, what happened instead
-- logs: `~/homebrew/logs/Steamcord/` and `journalctl -b | grep -i steamcord`
-
-Feature requests and "it works!" reports on unusual setups are just as valuable.
-
-> **The UI for the newer features is not final.** The in-game voice and POV
-> overlays, the fullscreen multi-POV grid and the quick-reply panel are recent
-> additions and their layout, controls and defaults are still open to change.
-> If something feels awkward or you'd arrange it differently, please say so in
-> an issue — the same goes for anything added from here on. Suggestions shape
-> these as much as bug reports do.
-
-## Credits
-
-- Original project: [marios8543/Deckcord](https://github.com/marios8543/Deckcord) — architecture, BrowserView setup, GStreamer screen share
-- [@aagaming](https://github.com/AAGaming00) — mic support via the SteamClient tab (WebRTC relay)
-- [@Epictek](https://github.com/Epictek) — QR Code login foundation
-- [@jessebofill](https://github.com/jessebofill) — Steam menu patching code
-- [Vesktop / Vencord](https://github.com/Vencord/Vesktop) — the native Discord client Steamcord drives
-
-### Code contributors
-
-- [@azizzidi](https://github.com/azizzidi) — **native Go Live in Gaming Mode** via the gamescope ScreenCast portal shim ([#10](https://github.com/Necrosiak/Steamcord/pull/10), landed in v1.15.0)
-- [@azizzidi](https://github.com/azizzidi) — **clickable notifications** for messages and calls, plus readable Discord mentions ([#71](https://github.com/Necrosiak/Steamcord/pull/71), landed in v1.41.1)
-- [@Memberoffoxhound](https://github.com/Memberoffoxhound) — five fixes carried over from his [GameModeCord](https://github.com/Memberoffoxhound/GameModeCord) fork (landed in v1.31.0): **the panel scaling to its own size** instead of Deck-absolute pixels, **B walking back one menu at a time**, **chat images and videos opening in the fullscreen viewer**, and two that were silently breaking screen sharing for everyone — **v4l2loopback looked up in sysfs** rather than hardcoded to `/dev/video42`, and **both share buttons no longer vanishing from DM calls**
-- [@jezonek](https://github.com/jezonek) — **push-to-talk on a keyboard key or a mouse button** ([#34](https://github.com/Necrosiak/Steamcord/pull/34)), including the backend evdev reader and its privacy constraints
-- [@SilvertongueRED](https://github.com/SilvertongueRED) — the **Windows port** from the [Steamcord-for-Windows](https://github.com/SilvertongueRED/Steamcord-for-Windows) fork ([#85](https://github.com/Necrosiak/Steamcord/pull/85)), which showed the integration points for Windows support (landed in v1.43.0)
-
-### Community bug hunters
-
-Steamcord is largely shaped by the people who report things. The full list —
-who found what, and which release it landed in — lives in
-**[CREDITS.md](CREDITS.md)**.
-
-### Goes well with
-
-- [decky-quick-tab](https://github.com/moi952/decky-quick-tab) by
-  [@moi952](https://github.com/moi952) — pins a plugin as its own tab in the
-  Quick Access Menu, so Steamcord opens in one press instead of going through
-  the Decky list. Not affiliated with this project, just genuinely useful with it.
-
-## AI disclaimer
-
-AI (Claude by Anthropic and Codex by OpenAI) was used in the making of this project — for reverse engineering, development and documentation. It was **not** used for any art or creative writing. Everything released publicly is reviewed by a human, and the results are my responsibility. If that is not something you are comfortable with, now you know.
-
-## Support development
-
-If this project is useful to you, you can support its ongoing development on [Ko-fi](https://ko-fi.com/nekyron).
-
-[![Support me on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/nekyron)
+BSD 3-Clause, same as upstream. See [LICENSE](LICENSE).
