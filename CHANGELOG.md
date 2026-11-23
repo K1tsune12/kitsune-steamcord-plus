@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.46.1-plus.1 — 2026-11-23
+## 1.0.0 — 2026-11-23
 
 First Steamcord Plus release, based on Steamcord 1.46.1.
 
