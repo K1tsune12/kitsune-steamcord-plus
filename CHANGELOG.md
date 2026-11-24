@@ -7,6 +7,7 @@ Brings in Steamcord 1.47.0 and 1.48.0.
 ### New
 
 - Switch between Discord accounts. Settings → Account lists the accounts saved on the device, with Switch and Remove for each one. Add an account shows a QR code to scan with the Discord app on your phone, in Game Mode.
+- A power button in the voice toolbar, next to Disconnect, turns the Discord session off after a confirmation. The same control stays in Settings → Account.
 
 ### Changes
 

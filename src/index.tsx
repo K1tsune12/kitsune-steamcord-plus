@@ -69,6 +69,7 @@ import {
 import { MuteButton } from "./components/buttons/MuteButton";
 import { DeafenButton } from "./components/buttons/DeafenButton";
 import { DisconnectButton } from "./components/buttons/DisconnectButton";
+import { PowerButton } from "./components/buttons/PowerButton";
 import {
   initVoiceShortcut, setShortcutCfg, captureBinding, cancelCapture,
   reloadShortcutCfg, refreshShortcutCfg,
@@ -1450,7 +1451,7 @@ const ExpandedCallPanel = () => {
     {/* Vue agrandie : contrôles et nom du salon centrés (demande user 30/09),
         comme dans le QAM. */}
     <Focusable flow-children="row" style={{ display: "flex", justifyContent: "center", gap: 8, marginBottom: 12 }}>
-      <MuteButton /><DeafenButton /><DisconnectButton />
+      <MuteButton /><DeafenButton /><DisconnectButton /><PowerButton />
     </Focusable>
     <div style={{ textAlign: "center" }}><VoiceChatChannel /></div>
     <SoundboardPanel />
@@ -1585,6 +1586,7 @@ const ContentBody = () => {
               <MuteButton />
               <DeafenButton />
               <DisconnectButton />
+              <PowerButton />
             </Focusable>
           </SR>
         </div>}
