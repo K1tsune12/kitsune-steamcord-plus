@@ -1,6 +1,6 @@
 {
   "name": "kitsune-steamcord-plus",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "module",
   "description": "Discord in Steam Gaming Mode — voice chat, DMs, QR login",
   "scripts": {

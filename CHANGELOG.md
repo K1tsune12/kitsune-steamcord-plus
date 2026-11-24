@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.1.0 — 2026-11-24
+
+Brings in Steamcord 1.47.0 and 1.48.0.
+
+### New
+
+- Switch between Discord accounts. Settings → Account lists the accounts saved on the device, with Switch and Remove for each one. Add an account shows a QR code to scan with the Discord app on your phone, in Game Mode.
+
+### Changes
+
+- Settings are split into six categories: Account, Status, Sound, Alerts, Video and General. The last one opened is remembered. The Language setting is under General.
+
 ## 1.0.0 — 2026-11-23
 
 First Steamcord Plus release, based on Steamcord 1.46.1.
